@@ -1,0 +1,7 @@
+https://ckan.dataplatform.nl/dataset/5ec18579-2809-47cb-8d0d-32f59160a044/resource/c790815d-ba1f-4908-bf00-3156e13008ba/download/data-overzicht-juni.zip
+https://ckan.dataplatform.nl/dataset/5ec18579-2809-47cb-8d0d-32f59160a044/resource/64cf26d4-a38d-4865-9da1-3d836ebbc4f0/download/data-overzicht-juli.zip
+https://ckan.dataplatform.nl/dataset/5ec18579-2809-47cb-8d0d-32f59160a044/resource/2cdeb681-0e75-4331-b4c9-41c477fa180c/download/data-overzicht-augustus.zip
+https://ckan.dataplatform.nl/dataset/5ec18579-2809-47cb-8d0d-32f59160a044/resource/2c0ed377-844e-455e-9baa-d2d21fd49975/download/data-overzicht-september.zip
+https://ckan.dataplatform.nl/dataset/5ec18579-2809-47cb-8d0d-32f59160a044/resource/be264540-1013-440d-b297-02e35926a0e5/download/data-overzicht-oktober.zip
+https://ckan.dataplatform.nl/dataset/5ec18579-2809-47cb-8d0d-32f59160a044/resource/5fd63e48-228b-477c-bc2d-8af6d5cbc481/download/data-overzicht-november.zip
+https://ckan.dataplatform.nl/dataset/5ec18579-2809-47cb-8d0d-32f59160a044/resource/f3771b2a-a2be-4418-a84b-6ac49895a93b/download/data-overzicht-december.zip
