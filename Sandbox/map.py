@@ -17,6 +17,10 @@ epsg4326.ImportFromEPSG(4326)
 rd2latlon = CoordinateTransformation(epsg28992, epsg4326)
 latlon2rd = CoordinateTransformation(epsg4326, epsg28992)
 
+## Set center of map to center of Utrecht and create map
+SF_COORDINATES = (52.092876, 5.104480)
+map = folium.Map(location=SF_COORDINATES, zoom_start=14)
+
 ## Set a marker for each location in the dataframe
 for each in locationdata.iterrows():
     ## Select all coordinates which are not 'null'
@@ -26,12 +30,8 @@ for each in locationdata.iterrows():
         ## Create a marker for each location
         folium.Marker(
             location=[Y, X],
-            popup=each[1]['StraatNaamWegVak'],
+            popup=(each[1]['MeetpuntRichtingCode']),
             icon=folium.Icon(color='green', icon='road')).add_to(map)
-
-## Set center of map to center of Utrecht
-SF_COORDINATES = (52.092876, 5.104480)
-map = folium.Map(location=SF_COORDINATES, zoom_start=14)
 
 ## Save the map to a .html file
 map.save('/tmp/map.html')
