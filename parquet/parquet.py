@@ -5,6 +5,7 @@ from pyspark.sql import DataFrame
 from app.spark import *
 
 TELLING = path.join(PARQUET_DIR, "telling")
+LOCATIE = path.join(PARQUET_DIR, "locatie")
 RESULT_DIR = path.join(PARQUET_DIR, "results")
 h = hdfs()
 if not h.exists(PARQUET_DIR):
@@ -20,7 +21,7 @@ def saveTelling(dataframe):
     :param DataFrame: the DataFrame to append
     :return: None
     """
-    dataframe.write.parquet(TELLING, mode="append")
+    dataframe.write.parquet(TELLING, mode="overwrite")
 
 
 def readTelling(session):
@@ -40,6 +41,34 @@ def clearTelling():
     h = hdfs()
     if h.exists(TELLING):
         h.delete(TELLING)
+
+
+def saveLocatie(dataframe):
+    """
+    Appends DataFrame to locatie parquet table
+    :param DataFrame: the DataFrame to append
+    :return: None
+    """
+    dataframe.write.parquet(LOCATIE, mode="overwrite")
+
+
+def readLocatie(session):
+    """
+    Returns a DataFrame containing the locatie data stored as a parquet table
+    :param session: SparkSession to be used for this DataFrame
+    :return: the DataFrame
+    """
+    return session.read.parquet(LOCATIE)
+
+
+def clearLocatie():
+    """
+    Removes the locatie parquet table, if it exists
+    :return: None
+    """
+    h = hdfs()
+    if h.exists(LOCATIE):
+        h.delete(LOCATIE)
 
 
 def saveResults(session, data, name, mode="overwrite"):

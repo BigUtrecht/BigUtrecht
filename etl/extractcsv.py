@@ -3,10 +3,10 @@ Script that contains functions for downloading and extracting zip files and csv'
 """
 import shutil
 import urllib
+from datetime import datetime
 from os import path, makedirs
 from zipfile import ZipFile
 
-import pandas as pd
 import pydoop.hdfs as H
 
 from parquet.parquet import *
@@ -84,38 +84,61 @@ def removeNonAscii(string):
     return news
 
 
-def createDataFrames(session, end=''):
+def createLocatieDataFrame(session, end="_Locatie"):
+    p = path.join(TEMP_DIR, '*%s.csv' % end)
+    rdd = session.sparkContext.textFile(p).map(lambda line: line.split(';'))
+
+    header = rdd.first()
+    header_new = [header[1], header[3], header[4], header[5], "XRD", "YRD"]
+
+    rdd_data = rdd.filter(lambda l: l != header).map(
+        lambda l: [str(l[1]), str(l[3]), str(l[4], ), str(l[5]), str(l[11]), str(l[12])])
+    header_str = ()
+    for i in range(len(header_new)):
+        header_str += tuple([str(header_new[i])])
+
+    frame = session.createDataFrame(rdd_data, header_str)
+    frame.registerTempTable("locatietemp")
+    frame = session.sql("SELECT MeetpuntRichtingCode, "
+                        "max(StraatNaamWegVak) StraatNaamWegVak, "
+                        "max(MeetpuntCode) MeetPuntCode, "
+                        "max(RichtingCode) RichtingCode, "
+                        "max(XRD) XRD, "
+                        "max(YRD) YRD "
+                        "FROM locatietemp GROUP BY MeetpuntRichtingCode")
+    return frame
+
+
+def createTellingDataFrame(session, end='_T'):
     """
     Converts temporary CSV files to dataframes using pandas
     :return: a list of SQL Dataframes
     """
-    h = H.hdfs()
-    filelist = map(lambda f: f['path'], h.list_directory(TEMP_DIR))
-    frames = []
-    for filename in filelist:
-        print filename
-        if filename.endswith('.csv') and filename.endswith(end + '.csv'):
-            with h.open_file(filename) as f:
-                p = pd.read_csv(f, sep=";")
-                p.columns = [removeNonAscii(c) for c in p.columns]
-                print p.columns
-                s_df = session.createDataFrame(p)
-                frames.append(s_df)
-    return frames
+    p = path.join(TEMP_DIR, '*%s.csv' % end)
+    rdd = session.sparkContext.textFile(p).map(lambda line: line.split(';'))
+    header = rdd.first()
+    rdd_data = rdd.filter(lambda l: l != header).map(lambda l: [str(l[0]), str(l[1]), str(l[2]), str(l[3]), int(l[4])])
+    header_str = ()
+    for i in range(len(header)):
+        header_str += tuple([str(header[i])])
 
-
-def storeDataFrames(session, clear=False):
-    if clear:
-        clearTelling()
-    for frame in createDataFrames(session, "_T"):
-        print frame.schema
-        saveTelling(frame)
+    frame = session.createDataFrame(rdd_data, header_str)
+    frame.registerTempTable("tellingtemp")
+    session.udf.register("timestamp", lambda d, t: long(
+        (datetime.strptime('%s %s' % (d, t), "%d-%m-%y %H:%M") - datetime(1970, 1, 1)).total_seconds()))
+    frame = session.sql("SELECT *, timestamp(Datum, Tijd) Timestamp FROM tellingtemp")
+    return frame
 
 if __name__ == '__main__':
     with Session() as session:
         print retrieveSources()
-        storeDataFrames(session, True)
+        frame = createTellingDataFrame(session)
+        saveTelling(frame)
+        frame = createLocatieDataFrame(session)
+        saveLocatie(frame)
+        locatie = readLocatie(session)
+        locatie.show()
         telling = readTelling(session)
         telling.show(5)
         print telling.agg({"Datum": "min"}).collect()
-        print telling.agg({"Datum": "max"}).collect()
+        print telling.agg({"Intensiteit": "max"}).collect()
