@@ -7,11 +7,9 @@ from os import path, makedirs
 from zipfile import ZipFile
 
 import pandas as pd
-import pydoop.hdfs as hdfs
-from pyspark import SQLContext
+import pydoop.hdfs as H
 
-import app.spark
-from constants.constants import *
+from parquet.parquet import *
 
 
 def downloadZiptoTempDir(location, tmpdir):
@@ -50,10 +48,10 @@ def copyFileToHDFSFolder(localpath, hdfspath):
     :return: None
     """
     if localpath.startswith('file:/'):
-        lf = hdfs.hdfs("", 0)
+        lf = H.hdfs("", 0)
     else:
-        lf = hdfs.hdfs()
-    h = hdfs.hdfs()
+        lf = H.hdfs()
+    h = H.hdfs()
     lf.copy(localpath, h, hdfspath)
 
 
@@ -86,25 +84,38 @@ def removeNonAscii(string):
     return news
 
 
-def createDataFrames():
+def createDataFrames(session, end=''):
     """
     Converts temporary CSV files to dataframes using pandas
     :return: a list of SQL Dataframes
     """
-    h = hdfs.hdfs()
+    h = H.hdfs()
     filelist = map(lambda f: f['path'], h.list_directory(TEMP_DIR))
     frames = []
-    with app.spark.Context() as sc:
-        sql_sc = SQLContext(sc)
-        for filename in filelist:
+    for filename in filelist:
+        print filename
+        if filename.endswith('.csv') and filename.endswith(end + '.csv'):
             with h.open_file(filename) as f:
                 p = pd.read_csv(f, sep=";")
                 p.columns = [removeNonAscii(c) for c in p.columns]
                 print p.columns
-                s_df = sql_sc.createDataFrame(p)
+                s_df = session.createDataFrame(p)
                 frames.append(s_df)
     return frames
 
 
+def storeDataFrames(session, clear=False):
+    if clear:
+        clearTelling()
+    for frame in createDataFrames(session, "_T"):
+        print frame.schema
+        saveTelling(frame)
+
 if __name__ == '__main__':
-    print createDataFrames()[0]
+    with Session() as session:
+        print retrieveSources()
+        storeDataFrames(session, True)
+        telling = readTelling(session)
+        telling.show(5)
+        print telling.agg({"Datum": "min"}).collect()
+        print telling.agg({"Datum": "max"}).collect()
