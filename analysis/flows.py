@@ -6,9 +6,7 @@ from parquet import parquet
 
 def createFlowFrame():
     """
-    Dummy analysis function
-    To be used as analysis template. Copy function body
-    Prints minimum and maximum date
+    Flow calculations on all locations, per timestamp.
     :return: None
     """
     with Session() as spark:
@@ -26,8 +24,8 @@ def createFlowFrame():
                                  "FROM telling "
                                  "GROUP BY UniekeMeetpuntRichtingCode, Timestamp")
         tellingGroup.registerTempTable("tellingGroup")
-        tellingJoin = spark.sql(
-            "SELECT * FROM tellingGroup JOIN locatie AS l ON tellingGroup.UniekeMeetpuntRichtingCode=l.MeetpuntRichtingCode")
+        tellingJoin = spark.sql("SELECT * FROM tellingGroup "
+                                "JOIN locatie AS l ON tellingGroup.UniekeMeetpuntRichtingCode=l.MeetpuntRichtingCode")
         tellingJoin.registerTempTable("tellingj")
         tellingIn = spark.sql("SELECT MeetpuntRichtingCode, "
                               "MeetpuntCode, "
@@ -54,7 +52,8 @@ def createFlowFrame():
                                 "in.Intensiteit Inflow, "
                                 "out.Intensiteit Outflow, "
                                 "(in.Intensiteit - out.Intensiteit) Flow, "
-                                "(in.Intensiteit + out.Intensiteit) Volume FROM tellingin in "
+                                "(in.Intensiteit + out.Intensiteit) Volume "
+                                "FROM tellingin in "
                                 "JOIN tellingout out ON in.MeetpuntCode=out.MeetpuntCode "
                                 "AND in.Timestamp=out.Timestamp")
         parquet.saveResults(spark, tellingFlow, "flow")
@@ -69,6 +68,6 @@ if __name__ == '__main__':
             "SELECT MeetpuntCode, max(Timestamp) Timestamp, Tijd, avg(Flow) Flow FROM flow GROUP BY Tijd, MeetpuntCode")
         avgflow.registerTempTable('avgflow')
         pdflow = spark.sql(
-            "SELECT Timestamp, Tijd, Flow FROM avgflow WHERE MeetpuntCode='1165' ORDER BY Timestamp").toPandas()
+            "SELECT Tijd, Flow, In FROM avgflow WHERE MeetpuntCode='1165' ORDER BY Timestamp").toPandas()
         pdflow.plot(x="Tijd", y="Flow", kind='bar')
         plt.show()
