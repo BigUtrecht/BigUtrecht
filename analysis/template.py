@@ -9,9 +9,9 @@ def dummyAnalysis():
     Prints minimum and maximum date
     :return: None
     """
-    with Session() as s:
-        # s is the SparkSession. It is the entry point for spark operations.
-        # s.sparkContext contains the SparkContext, if you really need it.
+    with Session() as spark:
+        # spark is the SparkSession. It is the entry point for spark operations.
+        # spark.sparkContext contains the SparkContext, if you really need it.
         telling = parquet.readTelling(s)  # DataFrame containing telling data
 
         # Dummy code, prints earliest and latest date
