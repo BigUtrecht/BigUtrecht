@@ -70,5 +70,5 @@ if __name__ == '__main__':
         avgflow.registerTempTable('avgflow')
         pdflow = spark.sql(
             "SELECT Timestamp, Tijd, Flow FROM avgflow WHERE MeetpuntCode='1165' ORDER BY Timestamp").toPandas()
-        pdflow.plot(x="Tijd", y="Flow", kind='errorbar')
+        pdflow.plot(x="Tijd", y="Flow", kind='bar')
         plt.show()
