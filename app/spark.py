@@ -25,9 +25,9 @@ class Session(object):
             conf.set('spark.master', 'yarn')
             conf.set('spark.executor.instances', 1)
             conf.set('spark.yarn.isPython', 'true')
-            self.session = pyspark.SparkContext(conf=conf)
         self.session = sql.SparkSession.builder.appName(APP_NAME).config(conf=conf).getOrCreate()
         return self.session
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.session.stop()
+        sql.SparkSession._instantiatedContext = None
