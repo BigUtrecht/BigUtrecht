@@ -1,13 +1,16 @@
 import folium
-import pandas as pd
+import pandas
 from osgeo.osr import SpatialReference, CoordinateTransformation
-from pyspark.sql.functions import *
+from parquet import parquet
+from app.spark import *
+
 
 def map_dataframe(dataframe, variable_string1, max_color, mid_color, popup_string1, save_string,
-                  variable_string2 = None, popup_string2 = None, variable_string3 = None, popup_string3 = None,
-                  variable_string4 = None, popup_string4 = None):
-        locationdata = pd.read_csv('/home/WUR/habes001/Downloads/UTREC_F_2015_jun_Locatie.csv')
-
+                  variable_string2=None, popup_string2=None, variable_string3=None, popup_string3=None,
+                  variable_string4=None, popup_string4=None):
+    with Session() as s:
+        # locationdata = pd.read_csv('/home/WUR/habes001/Downloads/UTREC_F_2015_jun_Locatie.csv')
+        locationdata = parquet.readLocatie(s).toPandas()
         ## Used to convert coordinates from RDnew to WGS84
         epsg28992 = SpatialReference()
         epsg28992.ImportFromEPSG(28992)
@@ -27,42 +30,66 @@ def map_dataframe(dataframe, variable_string1, max_color, mid_color, popup_strin
         ## Set a marker for each location in the dataframe
         for each in locationdata.iterrows():
             for line in dataframe.collect():
-                if each[1]['MeetpuntRichtingCode'] == line['UniekeMeetpuntRichtingCode']+'-1':
-                    if line[variable_string1] > max_color:
-                        color = 'red'
-                    elif line[variable_string1] > mid_color:
-                        color = 'orange'
-                    else:
-                        color = 'green'
+                if each[1]['MeetpuntRichtingCode'] == line['UniekeMeetpuntRichtingCode'] + '-1' or \
+                                each[1]['MeetpuntRichtingCode'] == line['UniekeMeetpuntRichtingCode']:
+
                     ## Select all coordinates which are not 'null'
-                    if str(each[1]['XcoordinaatRD'])[0].isdigit():
+                    if each[1]['XRD'] != '':
                         ## Convert coordinates
-                        X, Y, Z = rd2latlon.TransformPoint(each[1]['XcoordinaatRD'], each[1]['YcoordinaatRD'])
+                        X, Y, Z = rd2latlon.TransformPoint(int(each[1]['XRD']), int(each[1]['YRD']))
                         ## Create a marker for each location
                         if variable_string4 != None:
+                            if line[variable_string1] > max_color or line[variable_string2] > max_color or \
+                                            line[variable_string3] > max_color or line[variable_string4] > max_color:
+                                color = 'red'
+                            elif line[variable_string1] > mid_color or line[variable_string2] > mid_color or \
+                                            line[variable_string3] > mid_color or line[variable_string4] > mid_color:
+                                color = 'orange'
+                            else:
+                                color = 'green'
                             folium.Marker(
                                 location=[Y, X],
-                                popup=(folium.Popup(popup_string1+': '+str(int(line[variable_string1]))+', '+
-                                                    popup_string2+': '+str(int(line[variable_string2]))+', '+
-                                                    popup_string3+': '+str(int(line[variable_string3]))+', '+
-                                                    popup_string4+': '+str(int(line[variable_string4]))
+                                popup=(folium.Popup(popup_string1 + ': ' + str(int(line[variable_string1])) + ', ' +
+                                                    popup_string2 + ': ' + str(int(line[variable_string2])) + ', ' +
+                                                    popup_string3 + ': ' + str(int(line[variable_string3])) + ', ' +
+                                                    popup_string4 + ': ' + str(int(line[variable_string4]))
                                                     , max_width=200)),
                                 icon=folium.Icon(color=color, icon='road')).add_to(map)
                         elif variable_string3 != None:
+                            if line[variable_string1] > max_color or line[variable_string3] > max_color or \
+                                            line[variable_string4] > max_color:
+                                color = 'red'
+                            elif line[variable_string1] > mid_color or line[variable_string2] > mid_color or line[variable_string3] > mid_color:
+                                color = 'orange'
+                            else:
+                                color = 'green'
                             folium.Marker(
                                 location=[Y, X],
-                                popup=(folium.Popup(popup_string1+': '+str(int(line[variable_string1]))+', '+
-                                                    popup_string2+': '+str(int(line[variable_string2]))+', '+
-                                                    popup_string3+': '+str(int(line[variable_string3]))
+                                popup=(folium.Popup(popup_string1 + ': ' + str(int(line[variable_string1])) + ', ' +
+                                                    popup_string2 + ': ' + str(int(line[variable_string2])) + ', ' +
+                                                    popup_string3 + ': ' + str(int(line[variable_string3]))
                                                     , max_width=200)),
                                 icon=folium.Icon(color=color, icon='road')).add_to(map)
                         elif variable_string2 != None:
+                            if line[variable_string1] > max_color or line[variable_string2] > max_color:
+                                color = 'red'
+                            elif line[variable_string1] > mid_color or line[variable_string2] > mid_color:
+                                color = 'orange'
+                            else:
+                                color = 'green'
                             folium.Marker(
                                 location=[Y, X],
-                                popup=(folium.Popup(popup_string1+': '+str(int(line[variable_string1]))+', '+
-                                                    popup_string2+': '+str(int(line[variable_string2])), max_width=200)),
+                                popup=(folium.Popup(popup_string1 + ': ' + str(int(line[variable_string1])) + ', ' +
+                                                    popup_string2 + ': ' + str(int(line[variable_string2])),
+                                                    max_width=200)),
                                 icon=folium.Icon(color=color, icon='road')).add_to(map)
                         else:
+                            if line[variable_string1] > max_color:
+                                color = 'red'
+                            elif line[variable_string1] > mid_color:
+                                color = 'orange'
+                            else:
+                                color = 'green'
                             folium.Marker(
                                 location=[Y, X],
                                 popup=(popup_string1 + ': ' + str(int(line[variable_string1]))),
@@ -70,5 +97,6 @@ def map_dataframe(dataframe, variable_string1, max_color, mid_color, popup_strin
 
         ## Save the map to a .html file
         map.save(save_string)
+
 ## Display in Jupyter Notebook:
 # map
