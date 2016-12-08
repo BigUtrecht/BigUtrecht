@@ -9,3 +9,16 @@ export PYTHONPATH=$SPARK_HOME/python/lib/py4j-0.10.1-src
 
 export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
 sudo -E pip install pydoop
+
+# Install GDAL (in terminal)
+
+cd gdal-2.1.0/
+./configure --prefix=/usr/
+make
+sudo make install
+cd swig/python/
+sudo python setup.py install
+
+# Install folium
+
+sudo -E pip install folium
