@@ -1,5 +1,4 @@
 import folium
-import pandas
 from osgeo.osr import SpatialReference, CoordinateTransformation
 from parquet import parquet
 from app.spark import *
@@ -8,9 +7,16 @@ from app.spark import *
 def map_dataframe(dataframe, variable_string1, max_color, mid_color, popup_string1, save_string,
                   variable_string2=None, popup_string2=None, variable_string3=None, popup_string3=None,
                   variable_string4=None, popup_string4=None):
+    """
+    Map dataframe function
+    Maps the dataframe given as input to a folium map
+    Saves the map in the assigned location
+    :return: None
+    """
     with Session() as s:
-        # locationdata = pd.read_csv('/home/WUR/habes001/Downloads/UTREC_F_2015_jun_Locatie.csv')
+        ## Load the location data in a pandas dataframe
         locationdata = parquet.readLocatie(s).toPandas()
+
         ## Used to convert coordinates from RDnew to WGS84
         epsg28992 = SpatialReference()
         epsg28992.ImportFromEPSG(28992)
@@ -21,7 +27,6 @@ def map_dataframe(dataframe, variable_string1, max_color, mid_color, popup_strin
         epsg4326.ImportFromEPSG(4326)
 
         rd2latlon = CoordinateTransformation(epsg28992, epsg4326)
-        latlon2rd = CoordinateTransformation(epsg4326, epsg28992)
 
         ## Set center of map to center of Utrecht and create map
         SF_COORDINATES = (52.092876, 5.104480)
@@ -98,5 +103,3 @@ def map_dataframe(dataframe, variable_string1, max_color, mid_color, popup_strin
         ## Save the map to a .html file
         map.save(save_string)
 
-## Display in Jupyter Notebook:
-# map

@@ -1,12 +1,9 @@
+from pyspark.sql.functions import *
+
 from app.spark import *
 from parquet import parquet
-from pyspark.sql.functions import *
-from Sandbox import map
-import datetime
+from visualisation import map
 
-import folium
-import pandas as pd
-from osgeo.osr import SpatialReference, CoordinateTransformation
 
 def dummyAnalysis():
     """
