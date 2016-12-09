@@ -12,6 +12,7 @@ sudo -E pip install pydoop
 
 # Install GDAL (in terminal)
 
+
 cd gdal-2.1.0/
 ./configure --prefix=/usr/
 make

@@ -2,7 +2,7 @@ from pydoop.hdfs import hdfs
 from pyspark import RDD
 from pyspark.sql import DataFrame
 
-from app.spark import *
+from constants.spark import *
 
 TELLING = path.join(PARQUET_DIR, "telling")
 LOCATIE = path.join(PARQUET_DIR, "locatie")

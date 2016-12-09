@@ -5,7 +5,7 @@ import findspark
 import pyspark
 import pyspark.sql as sql
 
-from constants.constants import *
+from constants import *
 
 LOCAL = False
 

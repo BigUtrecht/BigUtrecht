@@ -85,6 +85,12 @@ def removeNonAscii(string):
 
 
 def createLocatieDataFrame(session, end="_Locatie"):
+    """
+    Creates a location Dataframe from the locatie csv files.
+    :param session: SparkSession
+    :param end: Suffix to filter CSV files on
+    :return: a Dataframe containing telling locations
+    """
     p = path.join(TEMP_DIR, '*%s.csv' % end)
     rdd = session.sparkContext.textFile(p).map(lambda line: line.split(';'))
 
@@ -101,17 +107,39 @@ def createLocatieDataFrame(session, end="_Locatie"):
     frame.registerTempTable("locatietemp")
     frame = session.sql("SELECT MeetpuntRichtingCode, "
                         "max(StraatNaamWegVak) StraatNaamWegVak, "
-                        "max(MeetpuntCode) MeetPuntCode, "
+                        "max(MeetpuntCode) MeetpuntCode, "
                         "max(RichtingCode) RichtingCode, "
                         "max(XRD) XRD, "
                         "max(YRD) YRD "
-                        "FROM locatietemp GROUP BY MeetpuntRichtingCode")
+                        "FROM locatietemp "
+                        "WHERE MeetpuntCode<>'1160' AND MeetpuntCode<>'1161' "
+                        "GROUP BY MeetpuntRichtingCode ")
+    # Add missing points manually
+    frame.registerTempTable("locatietemp")
+    okframe = session.sql("SELECT MeetpuntRichtingCode, "
+                          "StraatNaamWegVak, "
+                          "MeetpuntCode, "
+                          "RichtingCode, "
+                          "CAST(XRD AS int), "
+                          "CAST(YRD AS int) "
+                          "FROM locatietemp "
+                          "WHERE MeetpuntCode NOT IN ('1156', '1157', '1153')")
+    frame1156 = session.sql(
+        "SELECT MeetpuntRichtingCode, StraatNaamWegVak, MeetpuntCode, RichtingCode, 134144 AS XRD, 458090 AS YRD "
+        "FROM locatietemp WHERE MeetpuntCode='1156'")
+    frame1157 = session.sql(
+        "SELECT MeetpuntRichtingCode, StraatNaamWegVak, MeetpuntCode, RichtingCode, 134772 AS XRD, 457492 AS YRD "
+        "FROM locatietemp WHERE MeetpuntCode='1157'")
+    frame1153 = session.sql(
+        "SELECT MeetpuntRichtingCode, StraatNaamWegVak, MeetpuntCode, RichtingCode, 134944 AS XRD, 455428 AS YRD "
+        "FROM locatietemp WHERE MeetpuntCode='1153'")
+    frame = okframe.unionAll(frame1156).unionAll(frame1157).unionAll(frame1153)
     return frame
 
 
 def createTellingDataFrame(session, end='_T'):
     """
-    Converts temporary CSV files to dataframes using pandas
+    Converts temporary CSV files to dataframes
     :return: a list of SQL Dataframes
     """
     p = path.join(TEMP_DIR, '*%s.csv' % end)
@@ -128,6 +156,15 @@ def createTellingDataFrame(session, end='_T'):
         (datetime.strptime('%s %s' % (d, t), "%d-%m-%y %H:%M") - datetime(1970, 1, 1)).total_seconds()))
     frame = session.sql("SELECT *, timestamp(Datum, Tijd) Timestamp FROM tellingtemp")
     return frame
+
+
+def etl():
+    with Session() as spark:
+        print retrieveSources()
+        frame = createTellingDataFrame(spark)
+        saveTelling(frame)
+        frame = createLocatieDataFrame(spark)
+        saveLocatie(frame)
 
 if __name__ == '__main__':
     with Session() as session:

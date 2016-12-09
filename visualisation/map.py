@@ -1,7 +1,8 @@
 import folium
 from osgeo.osr import SpatialReference, CoordinateTransformation
+
+from constants.spark import *
 from parquet import parquet
-from app.spark import *
 
 
 def map_dataframe(dataframe, variable_string1, max_color, mid_color, popup_string1, save_string,

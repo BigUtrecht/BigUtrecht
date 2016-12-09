@@ -1,6 +1,6 @@
 from pyspark.sql.functions import *
 
-from app.spark import *
+from constants.spark import *
 from parquet import parquet
 from visualisation import map
 
