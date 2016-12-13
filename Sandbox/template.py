@@ -1,7 +1,7 @@
 from pyspark.sql.functions import *
 
 from constants.spark import *
-from parquet import parquet
+from etl import parquet
 from visualisation import map
 
 

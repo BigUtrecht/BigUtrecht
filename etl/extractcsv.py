@@ -9,7 +9,7 @@ from zipfile import ZipFile
 
 import pydoop.hdfs as H
 
-from parquet.parquet import *
+from etl.parquet import *
 
 
 def downloadZiptoTempDir(location, tmpdir):

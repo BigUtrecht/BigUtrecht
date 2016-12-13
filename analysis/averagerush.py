@@ -1,7 +1,7 @@
 from pyspark.sql.functions import *
 
 from constants.spark import *
-from parquet import parquet
+from etl import parquet
 from visualisation import map
 
 
@@ -67,6 +67,8 @@ def avgRushAnalysis():
                           '/tmp/map_avg_rush.html',  'MorningIntensityOut', 'Morning average intensity out',
                           'EveningIntensityIn', 'Evening average intensity in',
                           'EveningIntensityOut', 'Evening average intensity out')
+
+        parquet.saveResults(s, point_rush_avg_in_out, "point_rush")
 
 if __name__ == '__main__':
     avgRushAnalysis()

@@ -18,7 +18,7 @@ make install
 
 # Download and install GDAL
 cd ~
-wget "http://download.osgeo.org/gdal/2.1.0/gdal-2.1.0.tar.gz"
+wget http://download.osgeo.org/gdal/2.1.0/gdal-2.1.0.tar.gz
 tar -zxvf gdal-2.1.0.tar.gz
 cd gdal-2.1.0
 ./configure --prefix=/usr/

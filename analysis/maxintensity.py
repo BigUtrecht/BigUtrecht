@@ -1,7 +1,7 @@
 from pyspark.sql.functions import *
 
 from constants.spark import *
-from parquet import parquet
+from etl import parquet
 from visualisation import map
 
 
@@ -37,6 +37,8 @@ def maxPointAnalysis():
 
         ## Show the data on a map
         map.map_dataframe(max_total, 'MaxIntensiteit', 1000, 500, 'Maximum intensity', '/tmp/map_max_intensity.html')
+
+        parquet.saveResults(s, max_total, "maximum")
 
 if __name__ == '__main__':
     maxPointAnalysis()

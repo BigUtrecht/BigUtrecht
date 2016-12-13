@@ -1,10 +1,16 @@
 import matplotlib.pyplot as plt
 
 from constants.spark import Session
-from parquet import parquet
+from etl import parquet
 
 
 def createDistributionGraph():
+    """
+    Distribution analysis function
+    Calculates the distribution of cyclists over the different measurement points
+    Shows the results in a bar plot
+    :return: None
+    """
     with Session() as spark:
         flow = parquet.readResults(spark, "flow")
         flow.registerTempTable("flow")

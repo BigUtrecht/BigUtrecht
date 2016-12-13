@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 from constants.spark import Session
-from parquet import parquet
+from etl import parquet
 
 
 def createFlowFrame():
@@ -65,7 +65,8 @@ if __name__ == '__main__':
         flow = parquet.readResults(spark, "flow")
         flow.registerTempTable('flow')
         avgflow = spark.sql(
-            "SELECT MeetpuntCode, max(Timestamp) Timestamp, Tijd, avg(Flow) Flow, avg(Inflow) Inflow, -avg(Outflow) Outflow FROM flow GROUP BY Tijd, MeetpuntCode")
+            "SELECT MeetpuntCode, max(Timestamp) Timestamp, Tijd, avg(Flow) Flow, avg(Inflow) Inflow, "
+            "-avg(Outflow) Outflow FROM flow GROUP BY Tijd, MeetpuntCode")
         avgflow.registerTempTable('avgflow')
         pdflow = spark.sql(
             "SELECT Tijd, Flow, Inflow, Outflow FROM avgflow WHERE MeetpuntCode='1165' ORDER BY Timestamp").toPandas()

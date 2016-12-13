@@ -1,4 +1,4 @@
-from parquet.parquet import *
+from etl.parquet import *
 
 findspark.init()
 conf = pyspark.SparkConf()
