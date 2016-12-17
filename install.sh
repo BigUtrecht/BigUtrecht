@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # Welcome!
-echo "Downloading BigUtrecht and dependencies! Thanks for watching, Ioannis!"
+echo "Downloading BigUtrecht and dependencies!"
 
-# Set Spark environment
+# Set correct environment
 export SPARK_HOME=/mnt/spark-2.0.0-bin-hadoop2.7
-export PYTHONPATH=$SPARK_HOME/python/lib/py4j-0.10.1-src
+export PYTHONPATH=$SPARK_HOME/python/lib/py4j-0.10.1-src.zip:$SPARK_HOME/python
+export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
 
 # Download and install PROJ
 cd ~
@@ -28,7 +29,6 @@ cd swig/python/
 sudo python setup.py install
 
 # Download and install Pydoop
-export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
 sudo -E pip install pydoop
 
 # Download and install Folium
@@ -40,7 +40,8 @@ rm -R -f BigUtrecht
 mkdir BigUtrecht
 cd BigUtrecht
 git clone https://github.com/BigUtrecht/BigUtrecht.git
-python BigUtrecht/app/app.py
+echo "Thanks for watching, Ioannis!"
+/usr/bin/python2.7 ~/BigUtrecht/BigUtrecht/app.py
 
 
 
