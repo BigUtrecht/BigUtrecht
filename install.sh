@@ -6,16 +6,17 @@ echo "Downloading BigUtrecht and dependencies!"
 export SPARK_HOME=/mnt/spark-2.0.0-bin-hadoop2.7
 export PYTHONPATH=$SPARK_HOME/python/lib/py4j-0.10.1-src.zip:$SPARK_HOME/python
 export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/lib:/usr/lib:/usr/local/lib:/usr/local/lib64
 
-# Download and install PROJ
-cd ~
-wget http://download.osgeo.org/proj/proj-4.9.3.tar.gz
-tar xvfz proj-4.9.3.tar.gz
-cd proj-4.9.3
-mkdir build
-./configure --prefix=/usr/
-make
-make install
+## Download and install PROJ
+#cd ~
+#wget http://download.osgeo.org/proj/proj-4.9.3.tar.gz
+#tar xvfz proj-4.9.3.tar.gz
+#cd proj-4.9.3
+#mkdir build
+#./configure --prefix=/usr/
+#make
+#make install
 
 # Download and install GDAL
 cd ~
