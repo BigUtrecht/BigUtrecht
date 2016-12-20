@@ -55,7 +55,7 @@ def copyFileToHDFSFolder(localpath, hdfspath):
     lf.copy(localpath, h, hdfspath)
 
 
-def retrieveSources(sourcesfile='datalocations.txt'):
+def retrieveSources(sourcesfile=path.join(HOME_DIR, 'datalocations.txt')):
     """
     Maps a file with data source locations and uses downloadZiptoTempDir to download and extract these
     :param sourcesfile: path to a local file containing the urls of source data

@@ -81,7 +81,7 @@ class GUI(Frame):
         self.enableAll()
 
     def showFlow(self):
-        location = self.locaties[self.locatieList.curselection()]
+        location = self.locaties[self.locatieList.curselection()[0]]
         showFlowPlot(location)
 
 

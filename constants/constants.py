@@ -6,3 +6,5 @@ TEMP_DIR = path.join(BASE_DIR, "tempfiles")
 PARQUET_DIR = path.join(BASE_DIR, "parquet")
 
 APP_NAME = "Big_Utrecht"
+
+HOME_DIR = path.dirname(path.dirname(path.abspath(path.realpath(__file__))))

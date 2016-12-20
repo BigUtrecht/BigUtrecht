@@ -6,7 +6,9 @@ from etl.parquet import readLocatie
 def getLocations():
     with Session() as spark:
         locaties = readLocatie(spark)
-        locaties = locaties.select("MeetpuntRichtingCode").rdd.map(lambda r: r[0]).collect()
+        locaties.registerTempTable("locaties")
+        locaties = spark.sql("SELECT DISTINCT MeetpuntCode FROM locaties ORDER BY MeetpuntCode").rdd.map(
+            lambda r: r[0]).collect()
         return locaties
 
 
