@@ -49,7 +49,7 @@ mkdir BigUtrecht
 cd BigUtrecht
 git clone https://github.com/BigUtrecht/BigUtrecht.git
 echo "Thanks for watching, Ioannis!"
-/usr/bin/python2.7 ~/BigUtrecht/BigUtrecht/app.py
+/usr/bin/python2.7 ./BigUtrecht/app.py
 
 
 

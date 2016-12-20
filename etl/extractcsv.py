@@ -55,13 +55,13 @@ def copyFileToHDFSFolder(localpath, hdfspath):
     lf.copy(localpath, h, hdfspath)
 
 
-def retrieveSources(sourcesfile='./datalocations.txt'):
+def retrieveSources(sourcesfile='datalocations.txt'):
     """
     Maps a file with data source locations and uses downloadZiptoTempDir to download and extract these
     :param sourcesfile: path to a local file containing the urls of source data
     :return: None
     """
-    tmppath = './.tmp'
+    tmppath = '.tmp'
     tmppath = path.abspath(tmppath)
     print tmppath
     if not path.exists(tmppath):
