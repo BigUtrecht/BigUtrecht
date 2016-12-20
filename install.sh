@@ -25,9 +25,16 @@ tar -zxvf gdal-2.1.0.tar.gz
 cd gdal-2.1.0
 ./configure --prefix=/usr/
 make
-sudo make install
+sudo -E make install
+sudo -E ldconfig
 cd swig/python/
 sudo python setup.py install
+
+# Download and install Pandas
+sudo -E pip install pandas
+
+# Download and install Matplotlib
+sudo -E pip install matplotlib
 
 # Download and install Pydoop
 sudo -E pip install pydoop
